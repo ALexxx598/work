@@ -14,7 +14,7 @@ class CreateProfileTable extends Migration
     public function up()
     {
         Schema::create('profile', function (Blueprint $table) {
-            $table->integer('id',)->index()->primary();
+            $table->unsignedBigInteger('id',true)->index()->primary();
             $table->unsignedBigInteger('userId')->index();
             $table->string('surname')->nullable();
             $table->binary('image')->nullable();

@@ -18,6 +18,8 @@ Route::get('/', function () {
 });
 Route::get('/profile', [App\Http\Controllers\Main::class, 'openProfile'])->name('openProfile');
 
+Route::get('/showProfile', [App\Http\Controllers\Main::class, 'showProfile'])->name('showProfile');
+
 Route::post('/main', [App\Http\Controllers\Main::class, 'showMain'])->name('showMain');
 
 Route::get('/information', [App\Http\Controllers\Main::class, 'showInf'])->name('showInf');

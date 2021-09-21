@@ -22,7 +22,6 @@
     </head>
     <body>
         <div class="col-md-12">
-            <a class="nav-link" href="/profile">Profile</a>
                     <div class="navbar-header">
                         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                             <a class="mx-4 navbar-brand" href="#">Navbar</a>
@@ -37,10 +36,10 @@
                                         </li>
                                         @auth
                                             <li class="nav-item active">
-                                                <a class="nav-link" href="{{ route('login') }}">Home<span class="sr-only">(current)</span></a>
+                                                <a class="nav-link" href="{{ route('login') }}">Home</a>
                                             </li>
                                             <li class="nav-item active">
-                                                <a class="nav-link" href="{{ url('/Profile') }}">Profile<span class="sr-only">(current)</span></a>
+                                                <a class="nav-link" href="{{ url('/profile') }}">Profile<span class="sr-only">(current)</span></a>
                                             </li>
                                         @else
                                             <li>
