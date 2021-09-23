@@ -14,7 +14,7 @@ class CreateCalendarsTable extends Migration
     public function up()
     {
         Schema::create('calendars', function (Blueprint $table) {
-            $table->integer("id",)->primary();
+            $table->integer("id",true)->primary();
             $table->unsignedBigInteger("profileId")->index()->nullable();
             $table->string("eventType")->nullable();
             $table->text("eventInf")->nullable();

@@ -29,12 +29,12 @@ class Profile extends Model
         $this->errors = $valid->messages();
         return false;
     }
-    public function addProfile($inputs)
+    public function addProfile($inputs, $path)
     {
-            $imagetmp = addslashes(file_get_contents($_FILES['avatar']['tmp_name']));
+            //$imagetmp = addslashes(file_get_contents($_FILES['avatar']['tmp_name']));
             DB::insert('INSERT INTO `profile` (`userId`,`surname`,`image`,`number`) VALUES (:id,:surname,:image,:number)',
                 ['surname' => $inputs['surname'],
-                    'image' => $imagetmp,
+                    'image' => $path,
                     'number' => $inputs['number'],
                     'id' => Auth::user()->getAuthIdentifier()
                 ]);
@@ -42,7 +42,9 @@ class Profile extends Model
 
     public function showProfile() : array
     {
-
-        return DB::select('SELECT `surname`,`image`,`number` FROM profile WHERE `userId` = :id', ['id'=>Auth::user()->getAuthIdentifier()]);
+        return  DB::select('SELECT `calendarId`,`surname`,`image`,`number`
+                                  FROM profile WHERE `userId` = :id',
+            ['id'=>Auth::user()->getAuthIdentifier()]);
     }
+
 }
