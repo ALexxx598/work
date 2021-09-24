@@ -1,25 +1,18 @@
 @extends('welcome')
 
 @section('Main-content')
-    <form action="/updateEvent" method="POST" >
+    <form action="/updateCalendarEvent/{{$id}}" method="POST" >
         @foreach($errors as $error)
             @foreach($error as $message)
                 <p>{{$message}}</p>
             @endforeach
         @endforeach
         @csrf
-        @if(isset($event))
-                @if($event == "update")
-                    <p>eventType<input type="text" name="eventType" value="eventType"></p>
-                    <p>eventInf<input type="text" name="eventInf" value="eventInf"></p>
-                    <p>eventDate<input type="date" name="eventDate" value="eventDate"></p>
-                    <p><input type="submit" value="Update"></p>
-                @elseif($event == "add")
-                    <p>eventType<input type="text" name="eventType" value="eventType"></p>
-                    <p>eventInf<input type="text" name="eventInf" value="eventInf"></p>
-                    <p>eventDate<input type="date" name="eventDate" value="eventDate"></p>
-                    <p><a href="{{url("/addCalendarEvent")}}"><input type="submit" value="ADD"></a></p>
-                @endif
-        @endif
+            {{method_field('PUT')}}
+            <p>event Type<input type="text" name="eventType" value="{{$event->eventType}}"></p>
+            <p>event Inf<input type="text" name="eventInf"  value="{{$event->eventInf}}"></p>
+            <p>event Date<input type="date" name="eventDate"  value="{{$event->eventDate}}"></p>
+            <p>event Time<input type="time" name="eventTime"  value="{{$event->time}}"></p>
+            <p><a href="{{url('/showAddCalendarEvent/' . $id)}}"> <input type="submit" value="Update"></a></p>
     </form>
 @endsection

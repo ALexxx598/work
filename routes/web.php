@@ -26,10 +26,15 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/showProfile', [App\Http\Controllers\Main::class, 'showProfile'])->name('showProfile');
     Route::post('/main', [App\Http\Controllers\Main::class, 'showMain'])->name('showMain');
 
-    Route::get('/deleteCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'deleteEvent'])->name('deleteEvent');
 
-    Route::get('/updateCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'showUpdateEvent'])->name('showUpdateEvent');
-    Route::post('/updateCalendarEvent', [App\Http\Controllers\CalendarController::class, 'updateEvent'])->name('updateEvent');
+    Route::get('/showUpdateCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'showUpdateEvent'])->name('showUpdateEvent');
+
+    Route::put('/updateCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'UpdateEvent'])->name('UpdateEvent');
+
+    Route::delete('/deleteCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'deleteEvent'])->name('deleteEvent');
+
+    Route::get('/showAddCalendarEvent', [App\Http\Controllers\CalendarController::class, 'showAddEvent'])->name('showAddEvent');
+
     Route::post('/addCalendarEvent', [App\Http\Controllers\CalendarController::class, 'addEvent'])->name('addEvent');
 });
 

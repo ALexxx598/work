@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
 use App\Models\Calendar;
 use App\Models\Profile;
 use Illuminate\Http\Request;
@@ -25,13 +26,16 @@ class CalendarController extends Controller
 
     public function showUpdateEvent($id)
     {
-        $move = 'update';
-        return view("/updateEvent/update")->with(['id'=>$id, 'move' =>$move]);
+        $event = new Calendar();
+        $event = $event->getEvent($id);
+        $event = $event[0];
+        return view("/Profile/updateEvent")->with(['id'=>$id, 'event'=>$event]);
     }
 
-    public function updateEvent(Request $request)
+    public function updateEvent($id, PostRequest $request)
     {
-
+        $event = new Calendar();
+        $event->updateEvent($request,$id);
         $this->returnProfile();
         return redirect('/showProfile')->with(compact(['profile'=>$this->assocArray['profile'], 'calendar'=> $this->assocArray['calendar']]));
     }
@@ -51,18 +55,27 @@ class CalendarController extends Controller
         }
         else
         {
-            return view();//мошенник
+            return redirect('/showProfile')->with(compact(['profile' => $this->assocArray['profile'],
+                'calendar' => $this->assocArray['calendar']]));//мошенннник
         }
         $this->returnProfile();
         return redirect('/showProfile')->with(compact(['profile' => $this->assocArray['profile'],
                         'calendar' => $this->assocArray['calendar']]));
 
     }
-    public function addEvent()
+    public function addEvent(PostRequest $request)
     {
-
+        $event = new Calendar();
+        $event->addEvent($request);
         $this->returnProfile();
         return redirect('/showProfile')->with(compact(['profile'=>$this->assocArray['profile'],
                     'calendar'=> $this->assocArray['calendar']]));
     }
+
+    public function showAddEvent()
+    {
+        $event = new Calendar();
+        return view('/Profile/addCalendarEvent');
+    }
+
 }
