@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Requests\PostRequest;
+use http\Env\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,6 @@ use DateTime;
 class Calendar extends Model
 {
     use HasFactory;
-
 
     public function addEvent($request)
     {
@@ -30,13 +30,19 @@ class Calendar extends Model
     }
     public function getEvent($id)
     {
-        return DB::select("SELECT `eventType`, `eventDate`, `eventInf`, `time` FROM `calendars` WHERE `id` = :id", ['id'=>$id]);
+        return DB::select("SELECT `eventType`, `eventDate`, `eventInf`, `time`, `status` FROM `calendars` WHERE `id` = :id", ['id'=>$id]);
     }
 
     public function updateEvent($request, $id)
     {
-        DB::update("UPDATE `calendars` SET `eventType` = :eventType,`eventInf` = :eventInf, `eventDate` = :eventDate, `time` = :eventTime  WHERE `id` = :id",
-                    ['id' => $id, 'eventType'=>$request->eventType, 'eventInf'=>$request->eventInf, 'eventDate'=>$request->eventDate, 'eventTime'=>$request->eventTime]);
+        $status = 0;
+        if($request->status="True")
+        {
+            $status = 1;
+        }
+        DB::update("UPDATE `calendars` SET `eventType` = :eventType,`eventInf` = :eventInf, `eventDate` = :eventDate, `time` = :eventTime, `status`= :status WHERE `id` = :id",
+                    ['id' => $id, 'eventType'=>$request->eventType, 'eventInf'=>$request->eventInf, 'eventDate'=>$request->eventDate, 'eventTime'=>$request->eventTime,
+                        'status'=>$status]);
     }
 
     public function deleteEvent($id)
@@ -65,13 +71,25 @@ class Calendar extends Model
         DB::update("UPDATE `profile` SET calendarId = NULL WHERE `calendarId` = :profileId", ['profileId'=>$profileId]);
     }
 
-    public function showCalendar()
+    public function showCalendar($pages)
     {
-        return DB::select(DB::raw("SELECT calendars.`eventType`, calendars.`eventInf`, calendars.`time`,
-                            calendars.`eventDate`, calendars.`updated_at`,calendars.`id`
+        $start = pages * 2;
+        $result = DB::select("SELECT calendars.`eventType`, calendars.`eventInf`, calendars.`time`,
+                            calendars.`eventDate`, calendars.`updated_at`,calendars.`id`, calendars.`status`
                             FROM `users` JOIN `profile` ON users.`id` = profile.`userId`
                             JOIN `calendars` ON profile.`calendarId` = calendars.`profileId`
-                            WHERE users.`id` = :id ORDER BY calendars.`eventDate`"), ['id' => Auth::user()->getAuthIdentifier()]);;
+                            WHERE users.`id` = :id ORDER BY calendars.`eventDate` LIMIT $start, 2" , ['id' => Auth::user()->getAuthIdentifier()]);
+        return $result;
+    }
+
+    public function arrayPaginator($array, $request)
+    {
+        $page = Input::get('page', 1);
+        $perPage = 2;
+        $offset = ($page * $perPage) - $perPage;
+
+        return new LengthAwarePaginator(array_slice($array, $offset, $perPage, true), count($array), $perPage, $page,
+            ['path' => $request->url(), 'query' => $request->query()]);
     }
 
     public function checkTrue($id)
@@ -88,5 +106,14 @@ class Calendar extends Model
             return true;
         }
         return false;
+    }
+
+    public function getCount()
+    {
+        $result = DB::select(DB::raw("SELECT COUNT(calendars.`id`) AS count FROM `calendars`
+                            JOIN `profile` ON profile.`calendarId` = calendars.`profileId`
+                            JOIN `users` ON profile.`userId` = users.`Id`
+                            WHERE users.`id` = :id"), ['id'=> Auth::user()->getAuthIdentifier()]);
+        return $result[0]->count;
     }
 }

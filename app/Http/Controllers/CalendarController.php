@@ -19,9 +19,9 @@ class CalendarController extends Controller
         $profile = $profile->showProfile();
         $profile = array_merge(array($profile[0]));
         $calendar = new Calendar();
-        $calendar = $calendar->showCalendar();
+        $calendar = $calendar->showCalendar(0);
         $this->assocArray['profile'] = $profile[0];
-        $this->assocArray['calendar'] = $calendar;
+        $this->assocArray['calendar'] = array($calendar);
     }
 
     public function showUpdateEvent($id)
@@ -37,11 +37,13 @@ class CalendarController extends Controller
         $event = new Calendar();
         $event->updateEvent($request,$id);
         $this->returnProfile();
-        return redirect('/showProfile')->with(compact(['profile'=>$this->assocArray['profile'], 'calendar'=> $this->assocArray['calendar']]));
+        return redirect('/showProfile/0')->with(compact(['profile'=>$this->assocArray['profile'],
+            'calendar'=> $this->assocArray['calendar']]));
     }
 
     public function deleteEvent($id)
     {
+        $page = 0;
         $calendar = new Calendar();
         if($calendar->checkTrue($id))
         {
@@ -55,12 +57,12 @@ class CalendarController extends Controller
         }
         else
         {
-            return redirect('/showProfile')->with(compact(['profile' => $this->assocArray['profile'],
-                'calendar' => $this->assocArray['calendar']]));//мошенннник
+            return redirect("/showProfile/$page")->with(compact(['profile' => $this->assocArray['profile'],
+                'calendar' => $this->assocArray['calendar'], 'pages' => $page]));//мошенннник
         }
         $this->returnProfile();
-        return redirect('/showProfile')->with(compact(['profile' => $this->assocArray['profile'],
-                        'calendar' => $this->assocArray['calendar']]));
+        return redirect("/showProfile/$page")->with(compact(['profile' => $this->assocArray['profile'],
+                        'calendar' => $this->assocArray['calendar'], 'pages' => $page]));
 
     }
     public function addEvent(PostRequest $request)

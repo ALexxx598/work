@@ -11,7 +11,11 @@
         <p>event Type<input type="text" name="eventType" ></p>
         <p>event Inf<input type="text" name="eventInf"></p>
         <p>event Date<input type="date" name="eventDate"></p>
-        <p>event Date<input type="time" name="eventTime"></p>
+        <p>event Time<input type="time" name="eventTime"></p>
+            <select name="status" size="1">
+                <option value="False">False</option>
+                <option value="True">True</option>
+            </select>
         <p><input type="submit" value="ADD"></p>
     </form>
 @endsection

@@ -5,40 +5,46 @@
     <p>Surname :{{$profile[0]->surname}}</p>
     <p>Number :{{$profile[0]->number}}</p>
     <p><img src="{{asset('/storage/' . $profile[0]->image) }}"></p>
+    <table bordercolor="black" border="2" width="100%">
+        <tr><th><p>EventType</p></th><th><p>EventInf</p></th><th><p>EventTime</p></th><th><p>EventDate</p></th><th><p>Status</p></th><th><p>LastUpdate</p></th><th><p>DELETE</p></th><th><p>Update</p></th></tr>
     @if(isset($calendar))
-    <table>
-        <tr><th><p>EventType</p></th><th><p>EventInf</p></th><th><p>EventTime</p></th><th><p>EventDate</p></th><th><p>LastUpdate</p></th><th><p>DELETE</p></th><th><p>Update</p></th></tr>
-    @foreach($calendar as $event)
-            <tr><td>{{$event->eventType}}</td>
-                <td>{{$event->eventInf}}</td>
-                <td>{{$event->time}}</td>
-                <td>{{$event->eventDate}}</td>
-                <td>{{$event->updated_at}}</td>
-                <form action="/deleteCalendarEvent/{{$event->id}}" method="POST">
-                    <td><input type="submit" value="DELETE"></td>
-                    @method('DELETE')
-                    @csrf
+        @foreach($calendar as $event)
+                <tr>
+                    <td>{{$event->eventType}}</td>
+                    <td>{{$event->eventInf}}</td>
+                    <td>{{$event->time}}</td>
+                    <td>{{$event->eventDate}}</td>
+                    @if($event->status)
+                        <td>True</td>
+                    @else
+                        <td>False</td>
+                    @endif
+                    <td>{{$event->updated_at}}</td>
+                    <form action="/deleteCalendarEvent/{{$event->id}}" method="POST">
+                        <td><input type="submit" value="DELETE"></td>
+                        @method('DELETE')
+                        @csrf
+                    </form>
+                    <form action="/showUpdateCalendarEvent/{{$event->id}}" method="GET">
+                        <td><input type="submit" value="UPDATE"></td>
+                    </form>
+            @endforeach
+                <td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <form action="/showAddCalendarEvent" method="GET">
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><p><input type="submit" value="ADD"></p></td></tr>
                 </form>
-                <form action="/showUpdateCalendarEvent/{{$event->id}}" method="GET">
-                    <td><input type="submit" value="UPDATE"></td>
-                    @csrf
-                </form>
-        @endforeach
-        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-        <form action="/showAddCalendarEvent" method="GET">
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><p><input type="submit" value="ADD"></p></td></tr>
-            @csrf
-        </form>
     </table>
+    {{$calendar->links()}}
+            @for($page = 0; $page<$count/2;$page++)
+                <a href="/showProfile/{{$page}}">{{$page}}</a> -
+            @endfor
+            ...
     @else
-        <table>
-            <tr><th><p>EventType</p></th><th><p>EventInf</p></th><th><p>EventTime</p></th><th><p>EventDate</p></th><th><p>LastUpdate</p></th><th><p>DELETE</p></th><th><p>Update</p></th></tr>
         </table>
-        <p></p>
-        <form action="/showAddCalendarEvent" method="GET">
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><p><input type="submit" value="AddEvent"></p></td></tr>
-            @csrf
-        </form>
+            <p></p>
+            <form action="/showAddCalendarEvent" method="GET">
+                <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><p><input type="submit" value="AddEvent"></p></td></tr>
+            </form>
     @endif
-
 @endsection

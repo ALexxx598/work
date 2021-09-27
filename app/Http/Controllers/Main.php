@@ -20,6 +20,7 @@ use Image;
 
 class Main extends Controller
 {
+
     public function openProfile()
     {
         return view('/Profile/profile');
@@ -28,15 +29,17 @@ class Main extends Controller
     {
         return view('/information');
     }
-    public function showProfile()
+    public function showProfile($pages = 0)
     {
         $profile = new Profile();
         $profile = $profile->showProfile();
         if(isset($profile[0]->calendarId))
         {
+
             $calendar = new Calendar();
-            $calendar = $calendar->showCalendar();
-            return view('/Profile/showProfile')->with(['profile'=>$profile,'calendar'=>$calendar ]);
+            $count = $calendar->getCount();
+            $calendar = $calendar->showCalendar($pages);
+            return view('/Profile/showProfile')->with(['profile'=>$profile,'calendar'=> $calendar, 'count'=>$count, 'pages'=> $pages]);
         }
         return view('/Profile/showProfile')->with(['profile'=>$profile]);
     }

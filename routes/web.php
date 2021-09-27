@@ -24,6 +24,7 @@ Auth::routes();
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/showProfile', [App\Http\Controllers\Main::class, 'showProfile'])->name('showProfile');
+    Route::get('/showProfile/{pages}', [App\Http\Controllers\Main::class, 'showProfile'])->name('showProfile');
     Route::post('/main', [App\Http\Controllers\Main::class, 'showMain'])->name('showMain');
 
 
