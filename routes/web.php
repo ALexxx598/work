@@ -27,7 +27,6 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/showProfile/{pages}', [App\Http\Controllers\Main::class, 'showProfile'])->name('showProfile');
     Route::post('/main', [App\Http\Controllers\Main::class, 'showMain'])->name('showMain');
 
-
     Route::get('/showUpdateCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'showUpdateEvent'])->name('showUpdateEvent');
 
     Route::put('/updateCalendarEvent/{id}', [App\Http\Controllers\CalendarController::class, 'UpdateEvent'])->name('UpdateEvent');

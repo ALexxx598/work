@@ -6,6 +6,7 @@ use App\Models\Calendar;
 use App\Models\Post;
 use App\Models\Profile;
 use App\Models\User;
+use CalendarFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,19 +30,17 @@ class Main extends Controller
     {
         return view('/information');
     }
-    public function showProfile($pages = 0)
+    public function showProfile(Request $request, $pages = 0)
     {
         $profile = new Profile();
         $profile = $profile->showProfile();
         if(isset($profile[0]->calendarId))
         {
-
             $calendar = new Calendar();
-            $count = $calendar->getCount();
-            $calendar = $calendar->showCalendar($pages);
-            return view('/Profile/showProfile')->with(['profile'=>$profile,'calendar'=> $calendar, 'count'=>$count, 'pages'=> $pages]);
+            $calendar = $calendar->showCalendar($request);
+            return view("/Profile/showProfile")->with(['profile'=>$profile,'calendar'=> $calendar, 'pages'=> $pages]);
         }
-        return view('/Profile/showProfile')->with(['profile'=>$profile]);
+        return view("/Profile/showProfile")->with(['profile'=>$profile]);
     }
     public function showMain(Request $request)
     {

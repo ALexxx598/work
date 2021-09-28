@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Filters\QueryFilter;
 use App\Http\Requests\PostRequest;
+use App\Filters\CalendarFilter;
 use http\Env\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use DateTime;
+use PhpParser\Builder;
 
 
 class Calendar extends Model
@@ -17,11 +19,6 @@ class Calendar extends Model
 
     public function addEvent($request)
     {
-        $date = new DateTime();
-       $result = $date->getTimestamp();
-       // $date->format($result);
-        //$result = date_format($date, 'Y-m-d H:i:s');
-        //$result = date("Y-m-d H:i:s");
         DB::insert("INSERT INTO `calendars` (`profileId`, `eventType`, `eventInf`, `eventDate`, `time`)
                            VALUES (:profileId,:eventType,:eventInf,:eventDate,:eventTime)",
             ['profileId'=>$this->getCalendarId(), 'eventType'=>$request->eventType,
@@ -36,7 +33,7 @@ class Calendar extends Model
     public function updateEvent($request, $id)
     {
         $status = 0;
-        if($request->status="True")
+        if($request->status=="True")
         {
             $status = 1;
         }
@@ -55,41 +52,36 @@ class Calendar extends Model
          $result = DB::select("SELECT COUNT(`id`) AS count FROM `calendars` WHERE `profileId` = :id", ['id'=>$profileId]);
         return $result[0]->count;
     }
+
     public function getProfileId($id): int
     {
         $result = DB::select(DB::raw("SELECT `profileId` FROM `calendars` WHERE `id` = :id "), ['id'=>$id]);
         return $result[0]->profileId;
     }
+
     public function getCalendarId(): int
     {
         $result = DB::select(DB::raw("SELECT `calendarId` FROM `profile` JOIN `users` ON users.`id` = profile.`userId`
                                 WHERE users.`id` = :id "), ['id'=>Auth::user()->getAuthIdentifier()]);
         return $result[0]->calendarId;
     }
+
     public function deleteCalendarKey($profileId)
     {
         DB::update("UPDATE `profile` SET calendarId = NULL WHERE `calendarId` = :profileId", ['profileId'=>$profileId]);
     }
 
-    public function showCalendar($pages)
+    public function showCalendar($request)
     {
-        $start = pages * 2;
-        $result = DB::select("SELECT calendars.`eventType`, calendars.`eventInf`, calendars.`time`,
-                            calendars.`eventDate`, calendars.`updated_at`,calendars.`id`, calendars.`status`
-                            FROM `users` JOIN `profile` ON users.`id` = profile.`userId`
-                            JOIN `calendars` ON profile.`calendarId` = calendars.`profileId`
-                            WHERE users.`id` = :id ORDER BY calendars.`eventDate` LIMIT $start, 2" , ['id' => Auth::user()->getAuthIdentifier()]);
-        return $result;
-    }
-
-    public function arrayPaginator($array, $request)
-    {
-        $page = Input::get('page', 1);
-        $perPage = 2;
-        $offset = ($page * $perPage) - $perPage;
-
-        return new LengthAwarePaginator(array_slice($array, $offset, $perPage, true), count($array), $perPage, $page,
-            ['path' => $request->url(), 'query' => $request->query()]);
+        $calendars = Calendar::query();
+        $calendars->select('calendars.id','calendars.profileId',
+                    'calendars.eventType','calendars.eventInf','calendars.eventDate', 'calendars.updated_at','calendars.status','calendars.time')->
+                    join('profile', 'calendars.profileId','=','profile.calendarId')->
+                    join('users', 'profile.userId','=','users.id')->
+                    where('users.id','=',Auth::user()->getAuthIdentifier())->orderBy('calendars.eventDate')->orderBy('calendars.time');
+        $filter = new CalendarFilter();
+        $calendars = $filter->filter($request, $calendars);
+        return $calendars->paginate(2)->withPath("?" . $request->getQueryString());
     }
 
     public function checkTrue($id)
@@ -116,4 +108,7 @@ class Calendar extends Model
                             WHERE users.`id` = :id"), ['id'=> Auth::user()->getAuthIdentifier()]);
         return $result[0]->count;
     }
+
+
+
 }
